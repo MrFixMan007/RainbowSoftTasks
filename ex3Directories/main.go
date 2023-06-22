@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
-	"time"
 )
 
 func main() {
-	start := time.Now()
 	var adresses []string
 	//Флаги
 	root, sizeLimit, err := flagParsing()
@@ -22,31 +21,32 @@ func main() {
 
 	names, values, err := listDirByReadDir(root)
 	if err != nil {
-		fmt.Println("Не удалось") //TODO
-		os.Exit(1)                //TODO
+		fmt.Println(err)
+		os.Exit(2)
 	}
-
 	for i, v := range values {
 		if v > sizeLimit {
-			fmt.Printf("Размер файла %s = %d\n", names[i], v)
-			adresses = append(adresses, fmt.Sprintf("%s/%s", root, names[i]))
+			fmt.Printf("[%d] %s с размером = %d > %d\n", i, names[i], v, sizeLimit)
+			adresses = append(adresses, names[i])
+		} else {
+			fmt.Printf("[%d] %s с размером = %d\n", i, names[i], v)
 		}
 	}
 	err = WriteFile(adresses, root)
 	if err != nil {
-		fmt.Println("Не удалось") //TODO
-		os.Exit(1)                //TODO
+		fmt.Println(err)
+		os.Exit(3)
 	}
-	fmt.Printf("Время выполнения: %0.3f секунд\n", float64(time.Since(start)/time.Millisecond)/1000)
 }
 
 // flagParsing проверяем и возвращаем переданные параметры
 func flagParsing() (string, int64, error) {
 	root := flag.String("root", "", "Адрес на директорию должен быть указан в формате: /home/...")
-	sizeLimit := flag.Int64("sizeLimit", 0, "Максимальный размер (в Кб) должен быть указан в формате числа")
+	sizeLimit := flag.Int64("sizeLimit", 0, "Максимальный размер (в байтах) должен быть указан в формате натурального числа")
 	flag.Parse()
 
-	if *root == "" || *sizeLimit == 0 {
+	matched, _ := regexp.MatchString("^/home/", *root) //Проверяем начало
+	if *root == "" || *sizeLimit < 0 || !matched {
 		return "", 0, errors.New("")
 	}
 	return *root, *sizeLimit, nil
@@ -62,7 +62,7 @@ func WriteFile(body []string, src string) error {
 
 	n, err := file.WriteString(strings.Join(body, "\n"))
 	if err != nil {
-		return fmt.Errorf("ошибка с записью в файл: %s (%d)", err, n)
+		fmt.Printf("ошибка с записью в файл: %s (%d)", err, n)
 	}
 	return nil
 }
@@ -76,34 +76,41 @@ func GetSize(root string) (int64, error) {
 	return fInfo.Size(), nil
 }
 
+// listDirByReadDir возвращает названия подпапок, файлов и из размеры по переданному адресу
 func listDirByReadDir(path string) ([]string, []int64, error) {
-	var body []int64
+	var sizes []int64
 	var names []string
 	lst, err := ioutil.ReadDir(path)
 	if err != nil {
-		return names, body, fmt.Errorf("ошибка с поиском директории: %s", err)
+		return names, sizes, fmt.Errorf("ошибка с чтением директории: %s", err)
 	}
 	for _, val := range lst {
-		if val.IsDir() {
-			// names1, values1, err1 := listDirByReadDir(fmt.Sprintf("%s/%s", path, val.Name()))
-			// if err1 != nil {
-			// 	fmt.Println("Не удалось") //TODO
-			// 	os.Exit(1)
-			// }
-			// body = append(body, value)
-			// names = append(names, val.Name())
-			//TODO
-			//с файлами работает
-			//TODO
-		} else {
-			value, err := GetSize(fmt.Sprintf("%s/%s", path, val.Name()))
+		if val.IsDir() { // Обработка подпапки и её внутренностей
+			names1, sizes1, err := listDirByReadDir(fmt.Sprintf("%s/%s", path, val.Name())) //Рекурсивный вызов функции
 			if err != nil {
-				fmt.Printf("ошибка с при чтении размера файла: %s", err)
+				fmt.Printf("ошибка с чтением директории: %s", err)
 				continue
 			}
-			body = append(body, value)
-			names = append(names, val.Name())
+			value := 0
+			for _, v := range sizes1 { //Подсчитываем размер папки
+				value += int(v)
+			}
+
+			names = append(names, fmt.Sprintf("%s/%s", path, val.Name())) //Добавляем подпапку
+			sizes = append(sizes, int64(value))                           //Добавляем размер подпапки
+
+			names = append(names, names1...) //Добавляем подфайлы
+			sizes = append(sizes, sizes1...) //Добавляем размеры подфайлов
+			fmt.Printf("[%s]\n", fmt.Sprintf("%s/%s", path, val.Name()))
+		} else { // Обработка файла
+			value, err := GetSize(fmt.Sprintf("%s/%s", path, val.Name()))
+			if err != nil {
+				fmt.Printf("ошибка при чтении размера файла: %s", err)
+				continue
+			}
+			sizes = append(sizes, value)                                  //Добавляем файлы
+			names = append(names, fmt.Sprintf("%s/%s", path, val.Name())) //Добавляем размеры файлов
 		}
 	}
-	return names, body, nil
+	return names, sizes, nil
 }
