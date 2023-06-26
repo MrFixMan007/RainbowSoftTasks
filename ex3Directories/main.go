@@ -47,7 +47,7 @@ func flagParsing() (string, int64, error) {
 
 	matched, _ := regexp.MatchString("^/home/", *root) //Проверяем начало
 	if *root == "" || *sizeLimit < 0 || !matched {
-		return "", 0, errors.New("")
+		return "", 0, errors.New("ошибка с обработкой флагов")
 	}
 	return *root, *sizeLimit, nil
 }
