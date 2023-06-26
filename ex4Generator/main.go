@@ -58,6 +58,7 @@ func Printer(flow int64, limit int64, count int64, wg *sync.WaitGroup) error {
 
 // Generator создаёт случайные числа от 0 до лимита и передаёт в канал
 func Generator(limit int64, channel chan int, wg1 *sync.WaitGroup, index int) {
+	//TODO Зацикливание
 	for {
 		source := rand.NewSource(time.Now().UnixNano())
 		r2 := rand.New(source)
