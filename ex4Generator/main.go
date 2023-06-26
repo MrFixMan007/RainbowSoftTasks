@@ -41,26 +41,50 @@ func flagParsing() (int64, int64, int64, error) {
 func Printer(flow int64, limit int64, count int64, wg *sync.WaitGroup) error {
 	defer wg.Done()
 	channel := make(chan int)
+	quit := make(chan bool)
 	wg1 := &sync.WaitGroup{}
+
 	for i := 0; (int64)(i) < flow; i++ {
 		wg1.Add(1)
-		go Generator(limit, channel, wg1, i)
-		//fmt.Printf("Создал %d-ю горутину\n", i+1)
+		go Generator(limit, channel, quit, wg1, i)
+		fmt.Printf("Создал %d-ю горутину\n", i+1)
 	}
 
 	for i := 0; i < int(count); i++ {
 		x := <-channel
 		fmt.Printf("[%d] %d\n", i+1, x)
 	}
+	// close(channel)
+	quit <- true
+
 	wg1.Add(-int(flow))
+	// for i := range channel {
+	// 	count--
+	// 	fmt.Printf("%d\n", i)
+	// 	if count <= 0 {
+	// 		quit <- true
+	// 		close(channel)
+	// 	}
+	// }
+	time.Sleep(5 * time.Second)
+	// wg1.Wait()
+	// wg1.Add(-int(flow))
 	return nil
 }
 
 // Generator создаёт случайные числа от 0 до лимита и передаёт в канал
-func Generator(limit int64, channel chan int, wg1 *sync.WaitGroup, index int) {
+func Generator(limit int64, channel chan int, quit chan bool, wg1 *sync.WaitGroup, index int) {
+	//defer wg1.Done()
+	defer fmt.Printf("Горутина %d завершилась\n", index)
 	for {
-		source := rand.NewSource(time.Now().UnixNano())
-		r2 := rand.New(source)
-		channel <- r2.Intn(int(limit))
+		select {
+		case <-quit:
+			quit <- true
+			return
+		default:
+			source := rand.NewSource(time.Now().UnixNano())
+			r2 := rand.New(source)
+			channel <- r2.Intn(int(limit))
+		}
 	}
 }
