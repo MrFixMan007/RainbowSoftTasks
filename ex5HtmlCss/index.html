@@ -7,18 +7,18 @@
  </head>
  <body>
 
- <form name="generator">
+ <form action="/out" method="post" name="generator">
   <p><b>Количество потоков:</b><br>
-   <input type="number" size="10">
+   <input id="flow" name="flow" type="number" size="10">
   </p>
   <p>Верхнее ограничение:<br>
-    <input type="number" size="10">
+    <input id="limit" name="limit" type="number" size="10">
     </p>
     <p>Количество чисел: {{.}}<br>
-    <input type="number" size="10">
+    <input id="count" name="count" type="number" size="10">
     </p>
   <p>
-    <input type="submit" value="Сгенерировать">
+    <input id="submitBtn" type="submit" value="Сгенерировать">
    </p>
  </form>
 
