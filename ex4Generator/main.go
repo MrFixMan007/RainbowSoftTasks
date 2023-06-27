@@ -15,6 +15,7 @@ func main() {
 
 	flow, limit, count, err := flagParsing()
 	if err != nil {
+		fmt.Println(err)
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -64,9 +65,8 @@ func Generator(limit int64, channel chan int, quit chan bool, wg1 *sync.WaitGrou
 	for {
 		_, ok := <-quit
 		if ok {
-			source := rand.NewSource(time.Now().UnixNano())
-			r2 := rand.New(source)
-			channel <- r2.Intn(int(limit))
+			rand.Seed(time.Now().UnixNano())
+			channel <- rand.Intn(int(limit))
 		} else {
 			break
 		}
