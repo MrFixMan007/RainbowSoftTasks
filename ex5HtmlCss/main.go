@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+func main() {
+	start()
+}
+
 // homePage открывает шаблон index.html
 func homePage(w http.ResponseWriter, r *http.Request) {
 	templ, _ := template.ParseFiles("index.html")
@@ -47,10 +51,6 @@ func start() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/out", out)
 	http.ListenAndServe(":4434", nil)
-}
-
-func main() {
-	start()
 }
 
 // Printer создаёт горутины, передаёт им параметры. Передаст в канал столько
