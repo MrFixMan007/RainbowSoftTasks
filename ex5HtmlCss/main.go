@@ -14,30 +14,31 @@ import (
 func homePage(w http.ResponseWriter, r *http.Request) {
 	templ, _ := template.ParseFiles("index.html")
 	templ.Execute(w, nil)
-	// fmt.Fprintf(w, StyleAdress)
 }
 
 // out открывает шаблон index.html
 func out(w http.ResponseWriter, r *http.Request) {
 	var answer string
+	channel := make(chan int)
+	wg := &sync.WaitGroup{}
+
 	flow, _ := strconv.Atoi(r.FormValue("flow"))
 	limit, _ := strconv.Atoi(r.FormValue("limit"))
 	count, _ := strconv.Atoi(r.FormValue("count"))
+
 	if flow <= 0 || limit <= 0 || count <= 0 {
 		answer = "Входные данные должны быть > 0"
 	} else {
-		//wg := &sync.WaitGroup{}
-		//wg.Add(1)
-		arr := Printer(flow, limit, count) //TODO
-		for _, v := range arr {
+		wg.Add(1)
+		go Printer(flow, limit, count, wg, channel)
+		for v := range channel {
 			answer += fmt.Sprintf("%d ", v)
 		}
-		//wg.Wait()
+		wg.Wait()
 	}
 
 	templ, _ := template.ParseFiles("out.html")
 	templ.Execute(w, answer)
-	// fmt.Fprintf(w, StyleAdress)
 }
 
 // start запускает сервер, открывает порт
@@ -52,12 +53,16 @@ func main() {
 	start()
 }
 
-// Printer создаёт горутины, передаёт им параметры. Выведет столько чисел, количество которых было передано.
-func Printer(flow int, limit int, count int) []int {
+// Printer создаёт горутины, передаёт им параметры. Передаст в канал столько
+// чисел, сколько требуется.
+func Printer(flow int, limit int, count int, wg *sync.WaitGroup, out chan int) {
+	defer fmt.Println("Printer завершил работу -")
+	defer wg.Done()
+	fmt.Println("Printer начал работу +")
 	channel := make(chan int)
 	quit := make(chan bool)
 	wg1 := &sync.WaitGroup{}
-	arr := []int{}
+
 	for i := 0; i < flow; i++ {
 		wg1.Add(1)
 		go Generator(limit, channel, quit, wg1, i)
@@ -65,18 +70,21 @@ func Printer(flow int, limit int, count int) []int {
 
 	for i := 0; i < int(count); i++ {
 		quit <- true
-		arr = append(arr, <-channel)
-		// fmt.Printf("[%d] %d\n", i+1, x)
+		out <- <-channel
 	}
+
 	close(quit)
 	wg1.Wait()
 	close(channel)
-	return arr
+	close(out)
 }
 
 // Generator создаёт случайные числа от 0 до лимита и передаёт в канал
 func Generator(limit int, channel chan int, quit chan bool, wg1 *sync.WaitGroup, index int) {
+	defer fmt.Printf("Generator %d завершился -\n", index+1)
 	defer wg1.Done()
+	fmt.Printf("Generator %d запустился +\n", index+1)
+
 	for {
 		_, ok := <-quit
 		if ok {
