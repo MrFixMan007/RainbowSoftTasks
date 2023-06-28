@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Генератор</title>
+  <link rel="stylesheet" href="styles/style.css">
+ </head>
+ <body>
+
+ <form action="/out" method="post" name="generator">
+  <p><b>Количество потоков:</b><br>
+   <input id="flow" name="flow" type="number" size="10">
+  </p>
+  <p>Верхнее ограничение:<br>
+    <input id="limit" name="limit" type="number" size="10">
+    </p>
+    <p>Количество чисел: {{.}}<br>
+    <input id="count" name="count" type="number" size="10">
+    </p>
+  <p>
+    <input id="submitBtn" type="submit" value="Сгенерировать">
+   </p>
+ </form>
+
+ </body>
+</html>
