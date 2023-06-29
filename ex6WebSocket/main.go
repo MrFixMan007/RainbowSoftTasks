@@ -13,37 +13,40 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// start запускает сервер, открывает порт
-func main() {
-	http.HandleFunc("/", homePage)
-	http.ListenAndServe(":4444", nil)
+func serveWs(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("serveWs запустился")
+	defer fmt.Println("serveWs закрылся")
+	fmt.Println(w)
+	fmt.Println(r)
+
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		if _, ok := err.(websocket.HandshakeError); !ok {
+			fmt.Println(err)
+		}
+		fmt.Println(err)
+		return
+	}
+	ws.WriteMessage(websocket.PingMessage, []byte{13, 21, 32, 13, 213})
+	fmt.Println("serveWs написал")
 }
 
-// homePage открывает шаблон index.html
-func homePage(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+func serveHome(w http.ResponseWriter, r *http.Request) {
 	var v = struct {
 		Host string
+		Data string
 	}{
 		r.Host,
+		"Hi!!!!!",
 	}
 	templ, _ := template.ParseFiles("index.html")
 	templ.Execute(w, &v)
+}
 
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println(conn, err)
-		return
+func main() {
+	http.HandleFunc("/", serveHome)
+	http.HandleFunc("/ws", serveWs)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println(err)
 	}
-	defer conn.Close()
-	fmt.Println("upgrader.Upgrade")
-
 }
