@@ -6,21 +6,33 @@
   <link rel="stylesheet" href="styles/style.css">
  </head>
  <body>
+  {{.Host}}
+  <script type="text/javascript">
+      (function() {
+          var socket = new WebSocket("ws://{{.Host}}");
 
- <form action="/out" method="post" name="generator">
-  <p><b>Количество потоков:</b><br>
-   <input id="flow" name="flow" type="number" size="10">
-  </p>
-  <p>Верхнее ограничение:<br>
-    <input id="limit" name="limit" type="number" size="10">
-    </p>
-    <p>Количество чисел: {{.}}<br>
-    <input id="count" name="count" type="number" size="10">
-    </p>
-  <p>
-    <input id="submitBtn" type="submit" value="Сгенерировать">
-   </p>
- </form>
+          socket.onopen = function(e) {
+            alert("[open] Соединение установлено");
+            alert("Отправляем данные на сервер");
+            socket.send("Меня зовут Джон");
+          };
 
+          socket.onmessage = function(event) {
+            alert(`[message] Данные получены с сервера: ${event.data}`);
+          };
+
+          socket.onclose = function(event) {
+            if (event.wasClean) {
+              alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+            } else {
+              alert('[close] Соединение прервано');
+            }
+          };
+
+          socket.onerror = function(error) {
+            alert(`[error]`);
+          };
+      })();
+  </script>
  </body>
 </html>
