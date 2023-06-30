@@ -6,33 +6,55 @@
   <link rel="stylesheet" href="styles/style.css">
  </head>
  <body>
-  {{.Host}}
-  <script type="text/javascript">
-      (function() {
-          var socket = new WebSocket("ws://{{.Host}}");
 
-          socket.onopen = function(e) {
-            alert("[open] Соединение установлено");
-            alert("Отправляем данные на сервер");
-            socket.send("Меня зовут Джон");
-          };
+ <!-- <form name="generator">
+  <p><b>Количество потоков:</b><br>
+   <input id="flow" name="flow" type="number" size="10">
+  </p>
 
-          socket.onmessage = function(event) {
-            alert(`[message] Данные получены с сервера: ${event.data}`);
-          };
+  <p>Верхнее ограничение:<br>
+    <input id="limit" name="limit" type="number" size="10">
+    </p>
 
-          socket.onclose = function(event) {
-            if (event.wasClean) {
-              alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-            } else {
-              alert('[close] Соединение прервано');
-            }
-          };
+    <p>Количество чисел:<br>
+    <input id="count" name="count" type="number" size="10">
+    </p>
+  <p>
+    <input id="submitBtn" type="submit" value="Сгенерировать">
+   </p>
+ </form> -->
 
-          socket.onerror = function(error) {
-            alert(`[error]`);
-          };
-      })();
-  </script>
+ <button id="myButton">Передаст: flow=3 limit=50 count=120</button>
+
+ <div>
+  <p>Ответы:</p>
+
+ </div>
+
+<script type="text/javascript">
+  
+  function calAlert() {
+    var socket = new WebSocket("ws://{{.Host}}/ws?flow=3&limit=50&count=120");
+    alert("отправил запрос")
+
+    socket.onmessage = function(event) {
+    alert('[message] Данные получены с сервера: ' + event.data);
+  };
+
+    socket.onclose = function(event) {
+      if (event.wasClean) {
+        alert('[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}');
+      } else {
+        alert('[close] Соединение прервано');
+      }
+    };
+
+    socket.onerror = function(error) {
+      alert('[error]');
+    };
+  };
+
+  myButton.addEventListener('click', calAlert);
+</script>
  </body>
 </html>
