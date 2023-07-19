@@ -6,55 +6,76 @@
   <link rel="stylesheet" href="styles/style.css">
  </head>
  <body>
+  <div>
+    <p><input type="number" id="inputFlow" placeholder="Введите кол-во потоков" size="50dp"></p>
+    <p><input type="number" id="inputLimit" placeholder="Введите максимальное число случайного числа" size="50dp"></p>
+    <p><input type="number" id="inputCount" placeholder="Введите кол-во случайных чисел" size="50dp"></p>
+  </div>
 
- <!-- <form name="generator">
-  <p><b>Количество потоков:</b><br>
-   <input id="flow" name="flow" type="number" size="10">
-  </p>
-
-  <p>Верхнее ограничение:<br>
-    <input id="limit" name="limit" type="number" size="10">
-    </p>
-
-    <p>Количество чисел:<br>
-    <input id="count" name="count" type="number" size="10">
-    </p>
-  <p>
-    <input id="submitBtn" type="submit" value="Сгенерировать">
-   </p>
- </form> -->
-
- <button id="myButton">Передаст: flow=3 limit=50 count=120</button>
+ <button id="myButton">Сгенерировать</button>
 
  <div>
   <p>Ответы:</p>
-
  </div>
 
 <script type="text/javascript">
+  i = 0
   
-  function calAlert() {
-    var socket = new WebSocket("ws://{{.Host}}/ws?flow=3&limit=50&count=120");
-    alert("отправил запрос")
+  function sendParameters() {
+    flow = document.getElementById('inputFlow').value
+    limit = document.getElementById('inputLimit').value
+    count = document.getElementById('inputCount').value
 
-    socket.onmessage = function(event) {
-    alert('[message] Данные получены с сервера: ' + event.data);
+    if (flow <= 0 || limit <= 0 || count <= 0) {
+      alert("Входные данные должны быть > 0")
+      return
+    }
+
+    let xhr = new XMLHttpRequest();
+    let url = new URL('http://{{.Host}}/post');
+    
+    url.searchParams.set('flow', flow);
+    url.searchParams.set('limit', limit);
+    url.searchParams.set('count', count);
+
+    xhr.open('POST', url);
+    xhr.send();
+
+    xhr.onload = function() {
+      callWebSocketUnswers()
+    };
+
+    xhr.onerror = function() { 
+      alert(`Ошибка соединения`);
+    };    
   };
+  
+  function callWebSocketUnswers(){
+    var socket = new WebSocket("ws://{{.Host}}/ws");
+    
+    var item = document.createElement("div");
+    i++
+    item.id = 'unswer' + i;
+    document.body.appendChild(item);
+
+    socket.onmessage = function (evt) {
+      item.textContent = item.textContent + evt.data + " ";      
+    };
 
     socket.onclose = function(event) {
       if (event.wasClean) {
-        alert('[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}');
+        alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
       } else {
         alert('[close] Соединение прервано');
       }
     };
 
     socket.onerror = function(error) {
-      alert('[error]');
+      alert(`[error]`);
     };
-  };
-
-  myButton.addEventListener('click', calAlert);
+  }
+    
+  myButton.addEventListener('click', sendParameters);
 </script>
  </body>
 </html>
