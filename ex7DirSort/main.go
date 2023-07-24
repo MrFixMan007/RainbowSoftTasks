@@ -91,7 +91,7 @@ func listDirByReadDir(path string) ([]File, error) {
 				value += int(files1[i].Size)
 			}
 
-			files = append(files, File{"type", fmt.Sprintf("%s/%s", path, val.Name()), int64(value)})
+			files = append(files, File{"dir", fmt.Sprintf("%s/%s", path, val.Name()), int64(value)})
 
 			files = append(files, files1...)
 		} else { // Обработка файла
