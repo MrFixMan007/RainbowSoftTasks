@@ -73,50 +73,57 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // WsHandler вызывает апгрейд до веб-сокета, запускает генерацию ответов
-func WsHandler(w http.ResponseWriter, r *http.Request) {
+func WsHandler(w http.ResponseWriter, r *http.Request, ch chan string) {
 	connection, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	channel := make(chan int)
-	wg := &sync.WaitGroup{}
+	for {
+		str := <- ch
+		channel := make(chan int)
+		wg := &sync.WaitGroup{}
 
-	flow, _ := strconv.Atoi(flow)
-	limit, _ := strconv.Atoi(limit)
-	count, _ := strconv.Atoi(count)
-
-	if flow <= 0 || limit <= 0 || count <= 0 {
-		connection.WriteMessage(websocket.TextMessage, []byte("Входные данные должны быть > 0"))
-	} else {
-		wg.Add(1)
-		go Printer(flow, limit, count, wg, channel)
-		for v := range channel {
-			err := connection.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%d", v)))
-			//time.Sleep(5 * time.Millisecond)
-			if err != nil {
-				fmt.Println(err)
-				return
+		fmt.Printf("Данные получены " + str)
+	
+		flow, _ := strconv.Atoi(flow)
+		limit, _ := strconv.Atoi(limit)
+		count, _ := strconv.Atoi(count)
+	
+		if flow <= 0 || limit <= 0 || count <= 0 {
+			connection.WriteMessage(websocket.TextMessage, []byte("Входные данные должны быть > 0"))
+		} else {
+			wg.Add(1)
+			go Printer(flow, limit, count, wg, channel)
+			for v := range channel {
+				err := connection.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%d", v)))
+				//time.Sleep(5 * time.Millisecond)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				fmt.Print(v, " ")
 			}
-			fmt.Print(v)
-
+			fmt.Println()
+			wg.Wait()
 		}
-		fmt.Println()
-		wg.Wait()
 	}
 }
 
 // PostHandler принимает параметры
-func PostHandler(w http.ResponseWriter, r *http.Request) {
+func PostHandler(w http.ResponseWriter, r *http.Request, ch chan string) {
 	flow = r.URL.Query().Get("flow")
 	limit = r.URL.Query().Get("limit")
 	count = r.URL.Query().Get("count")
+	ch <- fmt.Sprintf("%d %d %d", flow, limit, count)
 }
 
 func main() {
+	ch := make(chan string)
+	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./styles/"))))
 	http.HandleFunc("/", HomeHandler)
-	http.HandleFunc("/post", PostHandler)
-	http.HandleFunc("/ws", WsHandler)
+	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {PostHandler(w, r, ch)})
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {WsHandler(w, r, ch)})
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		fmt.Println(err)
 	}

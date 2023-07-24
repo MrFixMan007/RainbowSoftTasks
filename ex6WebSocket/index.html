@@ -20,6 +20,7 @@
 
 <script type="text/javascript">
   i = 0
+  var socket = new WebSocket("ws://{{.Host}}/ws");
   
   function sendParameters() {
     flow = document.getElementById('inputFlow').value
@@ -42,7 +43,6 @@
     xhr.send();
 
     xhr.onload = function() {
-      callWebSocketUnswers()
     };
 
     xhr.onerror = function() { 
@@ -50,15 +50,11 @@
     };    
   };
   
-  function callWebSocketUnswers(){
-    var socket = new WebSocket("ws://{{.Host}}/ws");
-    
-    var item = document.createElement("div");
-    i++
-    item.id = 'unswer' + i;
-    document.body.appendChild(item);
-
     socket.onmessage = function (evt) {
+      var item = document.createElement("div");
+      i++
+      item.id = 'unswer' + i;
+      document.body.appendChild(item);
       item.textContent = item.textContent + evt.data + " ";      
     };
 
@@ -73,7 +69,6 @@
     socket.onerror = function(error) {
       alert(`[error]`);
     };
-  }
     
   myButton.addEventListener('click', sendParameters);
 </script>
