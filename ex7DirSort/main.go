@@ -29,24 +29,26 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+
 	var files = []File{}
 	for i, v := range values {
 		files = append(files, File{types[i], names[i], v})
 	}
+	//сортировка
 	if strings.EqualFold(sortType, "asc") {
 		fmt.Println("Сортировка в порядке возрастания")
 		sort.Slice(files, func(i, j int) (less bool) {
 			return files[i].Size < files[j].Size
 		})
 	} else {
-		fmt.Println("Сортировка в порядке убывания")
+		fmt.Println("Сортировка в порядке убывания:")
 		sort.Slice(files, func(i, j int) (less bool) {
 			return files[i].Size > files[j].Size
 		})
 	}
 
-	for i, _ := range files {
-		fmt.Printf("[%d] %s %s %d\n", i, files[i].Type, files[i].Name, files[i].Size)
+	for i := range files {
+		fmt.Printf("[%d] %s %s %d байт(а)\n", i+1, files[i].Type, files[i].Name, files[i].Size)
 	}
 }
 
