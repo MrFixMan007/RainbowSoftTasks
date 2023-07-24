@@ -98,9 +98,10 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				return
 			}
-			fmt.Println("отправил", v)
+			fmt.Print(v)
 
 		}
+		fmt.Println()
 		wg.Wait()
 	}
 }
