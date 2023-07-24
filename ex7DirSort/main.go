@@ -72,7 +72,7 @@ func GetSize(root string) (int64, error) {
 	return fInfo.Size(), nil
 }
 
-// listDirByReadDir возвращает названия подпапок, файлов и из размеры по переданному адресу
+// listDirByReadDir возвращает типы, названия подпапок, файлов и их размеры по переданному адресу
 func listDirByReadDir(path string) ([]string, []string, []int64, error) {
 	var types []string
 	var names []string
@@ -100,7 +100,6 @@ func listDirByReadDir(path string) ([]string, []string, []int64, error) {
 			types = append(types, types1...)
 			names = append(names, names1...) //Добавляем подфайлы
 			sizes = append(sizes, sizes1...) //Добавляем размеры подфайлов
-			//fmt.Printf("[%s]\n", fmt.Sprintf("%s/%s", path, val.Name()))
 		} else { // Обработка файла
 			value, err := GetSize(fmt.Sprintf("%s/%s", path, val.Name()))
 			if err != nil {
