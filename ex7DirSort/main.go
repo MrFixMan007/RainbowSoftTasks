@@ -33,7 +33,7 @@ func main() {
 	}
 
 	//сортировка
-	if strings.EqualFold(sortType, "asc") {
+	if strings.EqualFold(sortType, "asc") || sortType == "" {
 		fmt.Println("Сортировка в порядке возрастания")
 		sort.Slice(files, func(i, j int) (less bool) {
 			return files[i].Size < files[j].Size
@@ -53,11 +53,11 @@ func main() {
 // flagParsing проверяем и возвращаем переданные параметры
 func flagParsing() (string, string, error) {
 	root := flag.String("root", "", "Адрес на директорию должен быть указан в формате: /home/...")
-	sortType := flag.String("sortType", "", "Укажите тип сортировки: ASC - по возрастаню, DESC - по убыванию")
+	sortType := flag.String("sortType", "", "Укажите тип сортировки: ASC - по возрастаню, DESC - по убыванию. По умолчанию ASC")
 	flag.Parse()
 
 	matched, _ := regexp.MatchString("^/home/", *root) //Проверяем начало адреса
-	if *root == "" || (!strings.EqualFold(*sortType, "asc") && !strings.EqualFold(*sortType, "desc")) || !matched {
+	if *root == "" || (*sortType != "" && !strings.EqualFold(*sortType, "asc") && !strings.EqualFold(*sortType, "desc")) || !matched {
 		return "", "", errors.New("ошибка с обработкой флагов")
 	}
 	return *root, *sortType, nil
@@ -74,34 +74,34 @@ func GetSize(root string) (int64, error) {
 
 // listDirByReadDir возвращает типы, названия подпапок, файлов и их размеры по переданному адресу
 func listDirByReadDir(path string) ([]File, error) {
-	var files []File
+	var allFiles []File
 	lst, err := ioutil.ReadDir(path)
 	if err != nil {
-		return files, fmt.Errorf("ошибка с чтением директории: %s", err)
+		return allFiles, fmt.Errorf("ошибка с чтением директории: %s", err)
 	}
-	for _, val := range lst {
-		if val.IsDir() { // Обработка подпапки и её внутренностей
-			files1, err := listDirByReadDir(fmt.Sprintf("%s/%s", path, val.Name())) //Рекурсивный вызов функции
+	for _, file := range lst {
+		if file.IsDir() { // Обработка подпапки и её внутренностей
+			filesInDir, err := listDirByReadDir(fmt.Sprintf("%s/%s", path, file.Name())) //Рекурсивный обход папки
 			if err != nil {
 				fmt.Printf("ошибка с чтением директории: %s", err)
 				continue
 			}
-			value := 0
-			for i := range files1 { //Подсчитываем размер папки
-				value += int(files1[i].Size)
+			sumOfSizesOfFiles := 0
+			for i := range filesInDir { //Подсчитываем размер папки
+				sumOfSizesOfFiles += int(filesInDir[i].Size)
 			}
 
-			files = append(files, File{"dir", fmt.Sprintf("%s/%s", path, val.Name()), int64(value)})
+			allFiles = append(allFiles, File{"dir", fmt.Sprintf("%s/%s", path, file.Name()), int64(sumOfSizesOfFiles)})
 
-			files = append(files, files1...)
+			allFiles = append(allFiles, filesInDir...)
 		} else { // Обработка файла
-			value, err := GetSize(fmt.Sprintf("%s/%s", path, val.Name()))
+			sizeOfFile, err := GetSize(fmt.Sprintf("%s/%s", path, file.Name()))
 			if err != nil {
 				fmt.Printf("ошибка при чтении размера файла: %s", err)
 				continue
 			}
-			files = append(files, File{"file", fmt.Sprintf("%s/%s", path, val.Name()), value})
+			allFiles = append(allFiles, File{"file", fmt.Sprintf("%s/%s", path, file.Name()), sizeOfFile})
 		}
 	}
-	return files, nil
+	return allFiles, nil
 }
