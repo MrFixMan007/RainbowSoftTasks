@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Директория</title>
+  <link rel="stylesheet" href="styles/style.css">
+ </head>
+ <body>
+  <div>
+    <p><input type="text" id="root" placeholder="Введите адрес" size="50dp"></p>
+    <p><input type="checkbox" id="sortType" checked="checked" >Cортировка по возрастанию</p>
+  </div>
+ <button id="myButton">Перейти</button>
+
+<script type="text/javascript">
+  
+  function getDir() {
+    root = document.getElementById('root').value
+    sortType = document.getElementById('sortType')
+
+    let xhr = new XMLHttpRequest();
+    let url = new URL('http://{{.Host}}/dir');
+    
+    url.searchParams.set('root', root);
+    url.searchParams.set('sortType', sortType);
+
+    xhr.open('GET', url);
+    xhr.send();
+
+    xhr.onload = function() {
+    };
+
+    xhr.onerror = function() { 
+      alert(`Ошибка соединения`);
+    };    
+  };
+
+  function checkSortTypeRadioButton(){
+    if(document.getElementById('sortType').checked == true){
+      alert("sdfg");
+    }
+  }
+    
+  myButton.addEventListener('click', getDir);
+  sortType.addEventListener('click', checkSortTypeRadioButton)
+</script>
+ </body>
+</html>
