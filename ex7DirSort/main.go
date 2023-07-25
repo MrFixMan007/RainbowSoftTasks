@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 )
 
 type File struct {
@@ -74,6 +75,7 @@ func GetSize(root string) (int64, error) {
 
 // listDirByReadDir возвращает типы, названия подпапок, файлов и их размеры по переданному адресу
 func listDirByReadDir(path string) ([]File, error) {
+	wg := &sync.WaitGroup{}
 	var allFiles []File
 	lst, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -81,19 +83,13 @@ func listDirByReadDir(path string) ([]File, error) {
 	}
 	for _, file := range lst {
 		if file.IsDir() { // Обработка подпапки и её внутренностей
-			filesInDir, err := listDirByReadDir(fmt.Sprintf("%s/%s", path, file.Name())) //Рекурсивный обход папки
+			filesInSubDir, err := listDirByReadDir(fmt.Sprintf("%s/%s", path, file.Name())) //Рекурсивный обход папки
 			if err != nil {
 				fmt.Printf("ошибка с чтением директории: %s", err)
 				continue
 			}
-			sizeOfDirectory := 0
-			for i := range filesInDir {
-				sizeOfDirectory += int(filesInDir[i].Size)
-			}
-
-			allFiles = append(allFiles, File{"dir", fmt.Sprintf("%s/%s", path, file.Name()), int64(sizeOfDirectory)})
-
-			allFiles = append(allFiles, filesInDir...)
+			wg.Add(1)
+			go addToListDirWithSize(&allFiles, filesInSubDir, path, file.Name(), wg)
 		} else { // Обработка файла
 			sizeOfFile, err := GetSize(fmt.Sprintf("%s/%s", path, file.Name()))
 			if err != nil {
@@ -103,5 +99,19 @@ func listDirByReadDir(path string) ([]File, error) {
 			allFiles = append(allFiles, File{"file", fmt.Sprintf("%s/%s", path, file.Name()), sizeOfFile})
 		}
 	}
+	wg.Wait()
 	return allFiles, nil
+}
+
+//addToListDirWithSize считает размер папки и добавляет в массив данные папки через указатель
+func addToListDirWithSize(allFiles *[]File, filesInSubDir []File, path string, name string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	sizeOfDirectory := 0
+	for i := range filesInSubDir {
+		sizeOfDirectory += int(filesInSubDir[i].Size)
+	}
+
+	*allFiles = append(*allFiles, File{"dir", fmt.Sprintf("%s/%s", path, name), int64(sizeOfDirectory)})
+
+	*allFiles = append(*allFiles, filesInSubDir...)
 }
