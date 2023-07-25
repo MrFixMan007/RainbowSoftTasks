@@ -86,12 +86,12 @@ func listDirByReadDir(path string) ([]File, error) {
 				fmt.Printf("ошибка с чтением директории: %s", err)
 				continue
 			}
-			sumOfSizesOfFiles := 0
-			for i := range filesInDir { //Подсчитываем размер папки
-				sumOfSizesOfFiles += int(filesInDir[i].Size)
+			sizeOfDirectory := 0
+			for i := range filesInDir {
+				sizeOfDirectory += int(filesInDir[i].Size)
 			}
 
-			allFiles = append(allFiles, File{"dir", fmt.Sprintf("%s/%s", path, file.Name()), int64(sumOfSizesOfFiles)})
+			allFiles = append(allFiles, File{"dir", fmt.Sprintf("%s/%s", path, file.Name()), int64(sizeOfDirectory)})
 
 			allFiles = append(allFiles, filesInDir...)
 		} else { // Обработка файла
