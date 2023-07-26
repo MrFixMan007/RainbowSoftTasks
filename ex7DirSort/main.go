@@ -33,18 +33,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	//сортировка
-	if strings.EqualFold(sortType, "asc") || sortType == "" {
-		fmt.Println("Сортировка в порядке возрастания")
-		sort.Slice(files, func(i, j int) (less bool) {
-			return files[i].Size < files[j].Size
-		})
-	} else {
-		fmt.Println("Сортировка в порядке убывания:")
-		sort.Slice(files, func(i, j int) (less bool) {
-			return files[i].Size > files[j].Size
-		})
-	}
+	files = SortFiles(files, sortType)
 
 	for i := range files {
 		fmt.Printf("[%d] %s %s %d байт(а)\n", i+1, files[i].Type, files[i].Name, files[i].Size)
@@ -114,4 +103,20 @@ func addToListDirWithSize(allFiles *[]File, filesInSubDir []File, path string, n
 	*allFiles = append(*allFiles, File{"dir", fmt.Sprintf("%s/%s", path, name), int64(sizeOfDirectory)})
 
 	*allFiles = append(*allFiles, filesInSubDir...)
+}
+
+//SortFiles сортирует файлы по возрастанию по умолчанию или убываню и возвращает их
+func SortFiles(files []File, sortType string) []File {
+	if strings.EqualFold(sortType, "asc") || sortType == "" {
+		fmt.Println("Сортировка в порядке возрастания")
+		sort.Slice(files, func(i, j int) (less bool) {
+			return files[i].Size < files[j].Size
+		})
+	} else {
+		fmt.Println("Сортировка в порядке убывания:")
+		sort.Slice(files, func(i, j int) (less bool) {
+			return files[i].Size > files[j].Size
+		})
+	}
+	return files
 }
