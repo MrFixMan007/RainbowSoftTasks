@@ -29,11 +29,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		r.Host,
 	}
-	templ, _ := template.ParseFiles("index.html")
+	templ, _ := template.ParseFiles("./static/index.html")
 	templ.Execute(w, &v)
 }
 
 func DirHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
 	root, sortType := r.URL.Query().Get("root"), r.URL.Query().Get("sortType")
 
@@ -45,36 +46,17 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	files = SortFiles(files, sortType) //сортировка
+	files = SortFiles(files, sortType)
 
 	json_data, err := json.Marshal(files)
 	if err != nil {
 		fmt.Println(err)
-	}
-	var file1 []File
-	err = json.Unmarshal(json_data, &file1)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(file1[1])
 	}
 
 	num, err := w.Write(json_data)
 	if err != nil {
 		fmt.Println(num, err)
 	}
-	// var responseInBytes []byte
-	// for i := range files {
-	// 	responseInBytes = append(responseInBytes, []byte(fmt.Sprintf("%s %s %d байт(а)\n", files[i].Type, files[i].Name, files[i].Size))...)
-	// 	fmt.Printf("[%d] %s %s %d байт(а)\n", i+1, files[i].Type, files[i].Name, files[i].Size)
-	// }
-
-	// w.Header().Set("Content-Type", "application/json")
-	// if err := json.NewEncoder(w).Encode(files); err != nil {
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println("JSON Закодирован")
-	// }
 }
 
 //getIpPort читает и возвращает ip и port из файла config.json
@@ -93,7 +75,7 @@ func getIpPort() (string, string, error) {
 	var serverOptions ServerOptions
 	err = json.Unmarshal(data, &serverOptions)
 	if err != nil {
-		return "", "", fmt.Errorf("Ошбика чтения данных из файла: ", err)
+		return "", "", fmt.Errorf("Ошибка чтения данных из файла: ", err)
 	}
 	return serverOptions.Ip, serverOptions.Port, nil
 }
@@ -125,19 +107,6 @@ func listDirByReadDir(path string) ([]File, error) {
 	}
 	return allFiles, nil
 }
-
-//addToListDirWithSize считает размер папки и добавляет в массив данные папки через указатель
-// func addToListDirWithSize(allFiles *[]File, filesInSubDir []File, path string, name string, wg *sync.WaitGroup) {
-// 	defer wg.Done()
-// 	sizeOfDirectory := 0
-// 	for i := range filesInSubDir {
-// 		sizeOfDirectory += int(filesInSubDir[i].Size)
-// 	}
-
-// 	*allFiles = append(*allFiles, File{"dir", fmt.Sprintf("%s/%s", path, name), int64(sizeOfDirectory)})
-
-// 	*allFiles = append(*allFiles, filesInSubDir...)
-// }
 
 // GetFolderSize возвращает размер папки, по указанному адресу
 func GetFolderSize(path string) (int64, error) {
@@ -178,12 +147,10 @@ func GetFileSize(root string) (int64, error) {
 //SortFiles сортирует файлы по возрастанию по умолчанию или убываню и возвращает их
 func SortFiles(files []File, sortType string) []File {
 	if strings.EqualFold(sortType, "asc") || sortType == "" {
-		fmt.Println("Сортировка в порядке возрастания")
 		sort.Slice(files, func(i, j int) (less bool) {
 			return files[i].Size < files[j].Size
 		})
 	} else {
-		fmt.Println("Сортировка в порядке убывания:")
 		sort.Slice(files, func(i, j int) (less bool) {
 			return files[i].Size > files[j].Size
 		})
@@ -197,7 +164,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./styles/"))))
+	http.Handle("/static/styles/", http.StripPrefix("/static/styles/", http.FileServer(http.Dir("./static/styles/"))))
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/dir", DirHandler)
 
