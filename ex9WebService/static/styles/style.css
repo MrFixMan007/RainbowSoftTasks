@@ -1,0 +1,33 @@
+body{
+  color: #70002b;
+  font-family: Arial, Verdana, sans-serif;
+}
+
+input[type=number]{
+  color: brown;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #bdbdbd;
+  border-radius: 0.25rem;
+}
+
+button{
+  color: brown;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #bdbdbd;
+  border-radius: 0.25rem;
+}
+
+button:hover{
+    background-color: #db281b;
+    color: white;
+  }
+
+button:active{
+  background-color: #ff1100;
+  color: brown;
+}
