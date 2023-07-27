@@ -14,7 +14,44 @@ input[type=number]{
   border-radius: 0.25rem;
 }
 
-button{
+input[type=checkbox]:hover{
+  cursor: pointer;
+}
+
+#unswers{
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+#top{
+  width: 75%;
+  margin-left: 25%;
+}
+
+.filesUl {
+  padding: 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  font-size: 16px;
+}
+li {
+  position: relative;
+  padding: .4em .4em .4em .8em;
+  margin-top: .5em;
+  background: #D3D4DA;
+  color: #444;
+  text-decoration: none;
+  transition: all .3s ease-out;
+}
+li:hover {
+    background: #DCDDE1;
+    cursor: pointer;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+#myButton{
   color: brown;
   background-color: #fff;
   background-clip: padding-box;
@@ -22,12 +59,34 @@ button{
   border-radius: 0.25rem;
 }
 
-button:hover{
+#myButton:hover{
     background-color: #db281b;
     color: white;
-  }
+}
 
-button:active{
+#myButton:active{
   background-color: #ff1100;
   color: brown;
+}
+
+#backButton{
+  border-radius: 1rem;
+  height: 32px;
+  width: 32px;
+  background-color: white;
+  border: 0;
+  background-image: url("../images/backArrow32.png");
+  background-size: contain;
+}
+
+#backButton:hover{
+  background-color: #ff1100;
+}
+
+.fileLi{
+  list-style-image: url("../images/file32.png");
+}
+
+.folderLi{
+  list-style-image: url("../images/folder32.png");
 }

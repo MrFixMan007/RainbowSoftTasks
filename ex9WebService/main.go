@@ -167,6 +167,7 @@ func main() {
 	}
 	http.Handle("/static/styles/", http.StripPrefix("/static/styles/", http.FileServer(http.Dir("./static/styles/"))))
 	http.Handle("/static/script/", http.StripPrefix("/static/script/", http.FileServer(http.Dir("./static/script/"))))
+	http.Handle("/static/images/", http.StripPrefix("/static/images/", http.FileServer(http.Dir("./static/images/"))))
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/dir", DirHandler)
 
