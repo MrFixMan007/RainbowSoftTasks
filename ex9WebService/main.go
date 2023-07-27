@@ -22,6 +22,10 @@ type ServerOptions struct {
 	Port string
 }
 
+type FileError struct {
+	err string
+}
+
 // HomeHandler отправляет заголовок и вызывает открытие главной страницы
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	var v = struct {
@@ -48,7 +52,6 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files = SortFiles(files, sortType)
-
 	json_data, err := json.Marshal(files)
 	if err != nil {
 		fmt.Println(err)
