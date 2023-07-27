@@ -33,6 +33,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	templ.Execute(w, &v)
 }
 
+//DirHandler получает адрес и тип сортировки, сортирует и отправляет массив объектов в формате json
 func DirHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -165,6 +166,7 @@ func main() {
 		return
 	}
 	http.Handle("/static/styles/", http.StripPrefix("/static/styles/", http.FileServer(http.Dir("./static/styles/"))))
+	http.Handle("/static/script/", http.StripPrefix("/static/script/", http.FileServer(http.Dir("./static/script/"))))
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/dir", DirHandler)
 
