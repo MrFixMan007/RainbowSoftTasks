@@ -25,7 +25,7 @@ input[type=checkbox]:hover{
 
 #top{
   width: 75%;
-  margin-left: 25%;
+  margin-left: 12.5%;
 }
 
 .filesUl {
@@ -80,6 +80,10 @@ button:hover{
 }
 
 #backButton:hover{
+  background-color: #db281b;
+}
+
+#backButton:active{
   background-color: #ff1100;
 }
 

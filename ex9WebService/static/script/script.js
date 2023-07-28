@@ -14,55 +14,76 @@ function getBackDir(){
 }
 
 function getDir() {
-    rootDefault = "/"
-    root = rootDefault
-    rootInInput = document.getElementById('root').value
-    if(rootInInput != "" && rootInInput != null){
-        root = rootInInput;
-    }
-    document.getElementById('root').value = root;
+  var seconds = 0;
+  const timer = setInterval(()=>
+  {
+    seconds++;
+  }, 10);
 
-    sortType = document.getElementById('sortType')
+  rootDefault = "/"
+  root = rootDefault
+  rootInInput = document.getElementById('root').value
+  if(rootInInput != "" && rootInInput != null){
+      root = rootInInput;
+  }
+  document.getElementById('root').value = root;
 
-    let xhr = new XMLHttpRequest();
-    let url = new URL(`http://${window.location.host}/dir`);
-    
-    url.searchParams.set('root', root);
-    if(document.getElementById('sortType').checked == true){
-      url.searchParams.set('sortType', 'asc');
-    }
-    else url.searchParams.set('sortType', 'desc');
+  sortType = document.getElementById('sortType')
 
-    xhr.open('GET', url);
-    xhr.send();
+  let xhr = new XMLHttpRequest();
+  let url = new URL(`http://${window.location.host}/dir`);
+  
+  url.searchParams.set('root', root);
+  if(document.getElementById('sortType').checked == true){
+    url.searchParams.set('sortType', 'asc');
+  }
+  else url.searchParams.set('sortType', 'desc');
 
-    xhr.onload = function() {
-      let ul = document.createElement('ul');
-      ul.className = "filesUl";
-      ul.id = "files";
+  xhr.open('GET', url);
+  xhr.send();
 
-      unmarshFiles = JSON.parse(xhr.response);
+  xhr.onload = function() {
+    renderDir(xhr);
+    const divTimer = document.getElementById('timer');
+    clearInterval(timer)
+    divTimer.innerHTML=`Время выполнения: ${seconds/100} секунд(ы)`;
+  };
 
-      const divUnswers = document.getElementById('unswers');
-      divUnswers.innerHTML = "";
-      divUnswers.appendChild(ul);
-
-      for (let i = 0; i < unmarshFiles.length; i++){
-        var li = document.createElement("li");
-        li.id = i;
-        if(unmarshFiles[i].Type == "file") li.className = "fileLi"
-        else li.className = "folderLi"
-        li.textContent = unmarshFiles[i].Name.slice(root.length + 1) + " " + unmarshFiles[i].Size;
-        ul.onclick = (event) => {
-          if(unmarshFiles[event.target.id].Type == 'file') return
-          document.getElementById('root').value = unmarshFiles[event.target.id].Name;
-          getDir()
-        }
-        ul.append(li);
-      }
-    };
-
-    xhr.onerror = function() { 
-      alert('[Ошибка соединения]');
-    };
+  xhr.onerror = function() { 
+    alert('[Ошибка соединения]');
+  };
 };
+
+function renderDir(xhr){
+  const divUnswers = document.getElementById('unswers');
+  divUnswers.innerHTML = "";
+
+  unmarshFiles = JSON.parse(xhr.response);
+  if(unmarshFiles == null){
+    divUnswers.innerText = "Папка пуста";
+    return;
+  }
+
+  let ul = document.createElement('ul');
+  ul.className = "filesUl";
+  ul.id = "files";
+  divUnswers.appendChild(ul);
+
+  for (let i = 0; i < unmarshFiles.length; i++){
+    var li = document.createElement("li");
+    li.id = `filesLi${i}`;
+    if(unmarshFiles[i].Type == "file") li.className = "lis fileLi"
+    else li.className = "lis folderLi"
+    li.innerHTML = `${unmarshFiles[i].Name.slice(root.length + 1)}&nbsp;:&nbsp${unmarshFiles[i].Size} байт(ов)`;
+
+    ul.onclick = (event) => {
+      var dots = document.getElementsByClassName('lis'); //получаем все li
+      clickedFileLi = unmarshFiles[Array.from(dots).indexOf(event.target)] //получаем json-объект по индексу, найденному в массиве li через event.target
+
+      if(clickedFileLi.Type == 'file') return
+      document.getElementById('root').value = clickedFileLi.Name; //меняем строку ввода, если папка
+      getDir()
+    }
+    ul.append(li);
+  }
+}
