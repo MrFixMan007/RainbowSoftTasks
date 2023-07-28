@@ -1,3 +1,6 @@
+const serverErrorsMap = new Map();
+serverErrorsMap.set("fileNotExist", "Ошибка с чтением директории")
+
 myButton.addEventListener('click', getDir);
 backButton.addEventListener('click', getBackDir);
 getDir()
@@ -20,7 +23,8 @@ function getDir() {
     seconds++;
   }, 10);
 
-  rootDefault = "/"
+  rootDefault = "/home/danila"  //
+  oldRoot = root
   root = rootDefault
   rootInInput = document.getElementById('root').value
   if(rootInInput != "" && rootInInput != null){
@@ -43,6 +47,12 @@ function getDir() {
   xhr.send();
 
   xhr.onload = function() {
+    if (xhr.getResponseHeader("Error") != null){
+      alert(serverErrorsMap.get(xhr.getResponseHeader("Error")));
+      root = oldRoot;
+      document.getElementById('root').value = root;
+      return;
+    }
     renderDir(xhr);
     const divTimer = document.getElementById('timer');
     clearInterval(timer)

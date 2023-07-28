@@ -22,9 +22,10 @@ type ServerOptions struct {
 	Port string
 }
 
-type FileError struct {
-	err string
-}
+// type FileError struct {
+// 	typeError int
+// 	textError string
+// }
 
 // HomeHandler отправляет заголовок и вызывает открытие главной страницы
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,13 +43,13 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	root, sortType := r.URL.Query().Get("root"), r.URL.Query().Get("sortType")
+	fmt.Printf("Получен %s\n", root)
 
 	files, err := listDirByReadDir(root)
 	if err != nil {
-		_, err := w.Write([]byte(fmt.Sprintf("%s", err)))
-		if err != nil {
-			fmt.Println(err)
-		}
+		fmt.Printf("Ошибка: \n", err)
+		w.Header().Add("error", "fileNotExist")
+		return
 	}
 
 	files = SortFiles(files, sortType)
@@ -57,9 +58,9 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	num, err := w.Write(json_data)
+	_, err = w.Write(json_data)
 	if err != nil {
-		fmt.Println(num, err)
+		fmt.Println(err)
 	}
 }
 
