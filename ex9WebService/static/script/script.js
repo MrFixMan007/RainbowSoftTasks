@@ -33,7 +33,7 @@ function getDir() {
     seconds++;
   }, 10);
 
-  rootDefault = "/"  //
+  rootDefault = "/home/danila"  //
   oldRoot = root
   root = rootDefault
   rootInInput = document.getElementById('root').value
@@ -100,6 +100,7 @@ function renderDir(xhr){
     li.innerHTML = `${unmarshFiles[i].Name.slice(root.length + 1)}&nbsp;:&nbsp${unmarshFiles[i].Size} байт(ов)`;
 
     ul.onclick = (event) => { //событие нажатия на список ul
+      if(event.target == '[object HTMLUListElement]') return;
       var dots = document.getElementsByClassName('lis'); //получаем все li
       clickedFileLi = unmarshFiles[Array.from(dots).indexOf(event.target)] //получаем json-объект по индексу, найденному в массиве li через event.target
 
