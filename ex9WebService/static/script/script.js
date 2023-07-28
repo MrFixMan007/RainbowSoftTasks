@@ -2,7 +2,16 @@ const serverErrorsMap = new Map();
 serverErrorsMap.set("fileNotExist", "Ошибка с чтением директории")
 
 myButton.addEventListener('click', getDir);
+roor = document.getElementById('root');
+roor.addEventListener('keydown', function(event) {
+  if (event.code == 'Enter') {
+    getDir();
+  }
+});
 backButton.addEventListener('click', getBackDir);
+spinnerLoadDir = document.createElement('div')
+spinnerLoadDir.className = "loader"
+document.body.append(spinnerLoadDir)
 getDir()
 
 function getBackDir(){
@@ -16,14 +25,15 @@ function getBackDir(){
   getDir()
 }
 
-function getDir() {
+function getDir() {  
+  document.querySelector('.loader').classList.remove('hidden');
   var seconds = 0;
   const timer = setInterval(()=>
   {
     seconds++;
   }, 10);
 
-  rootDefault = "/home/danila"  //
+  rootDefault = "/"  //
   oldRoot = root
   root = rootDefault
   rootInInput = document.getElementById('root').value
@@ -47,10 +57,12 @@ function getDir() {
   xhr.send();
 
   xhr.onload = function() {
-    if (xhr.getResponseHeader("Error") != null){
+    if (xhr.getResponseHeader("Error") != null){ //Ошибка с чтением директории
       alert(serverErrorsMap.get(xhr.getResponseHeader("Error")));
       root = oldRoot;
       document.getElementById('root').value = root;
+
+      document.querySelector('.loader').classList.add('hidden');
       return;
     }
     renderDir(xhr);
@@ -65,6 +77,7 @@ function getDir() {
 };
 
 function renderDir(xhr){
+  document.querySelector('.loader').classList.add('hidden');
   const divUnswers = document.getElementById('unswers');
   divUnswers.innerHTML = "";
 
@@ -86,7 +99,7 @@ function renderDir(xhr){
     else li.className = "lis folderLi"
     li.innerHTML = `${unmarshFiles[i].Name.slice(root.length + 1)}&nbsp;:&nbsp${unmarshFiles[i].Size} байт(ов)`;
 
-    ul.onclick = (event) => {
+    ul.onclick = (event) => { //событие нажатия на список ul
       var dots = document.getElementsByClassName('lis'); //получаем все li
       clickedFileLi = unmarshFiles[Array.from(dots).indexOf(event.target)] //получаем json-объект по индексу, найденному в массиве li через event.target
 
