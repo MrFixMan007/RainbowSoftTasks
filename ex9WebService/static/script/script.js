@@ -33,7 +33,7 @@ function getDir() {
     seconds++;
   }, 10);
 
-  rootDefault = "/home/danila"  //
+  rootDefault = "/"  //
   oldRoot = root
   root = rootDefault
   rootInInput = document.getElementById('root').value
