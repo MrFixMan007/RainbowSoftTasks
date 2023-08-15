@@ -22,11 +22,6 @@ type ServerOptions struct {
 	Port string
 }
 
-// type FileError struct {
-// 	typeError int
-// 	textError string
-// }
-
 // HomeHandler отправляет заголовок и вызывает открытие главной страницы
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	var v = struct {
@@ -47,7 +42,7 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 
 	files, err := listDirByReadDir(root)
 	if err != nil {
-		fmt.Printf("Ошибка: \n", err)
+		fmt.Println(err)
 		w.Header().Add("error", "fileNotExist")
 		return
 	}
@@ -122,7 +117,7 @@ func GetFolderSize(path string) (int64, error) {
 	}
 	for _, file := range lst {
 		if file.IsDir() { // Обработка подпапки и её внутренностей
-			subFolderSize, err := GetFolderSize(path + "/" + file.Name())
+			subFolderSize, err := GetFolderSize(path + "/" + file.Name()) //получаем размер подпапки
 			if err != nil {
 				fmt.Printf("ошибка при чтении размера файла: %s", err)
 				continue
@@ -163,6 +158,7 @@ func SortFiles(files []File, sortType string) []File {
 	return files
 }
 
+//main получает необходимые конфигурационные данные, ставит обработчики
 func main() {
 	ip, port, err := getIpPort()
 	if err != nil {
