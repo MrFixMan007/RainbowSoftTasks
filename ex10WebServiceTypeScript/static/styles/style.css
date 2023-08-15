@@ -1,0 +1,139 @@
+body{
+  color: #70002b;
+  font-family: Arial, Verdana, sans-serif;
+}
+
+input[type=number]{
+  color: brown;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #bdbdbd;
+  border-radius: 0.25rem;
+}
+
+input[type=checkbox]:hover{
+  cursor: pointer;
+}
+
+#unswers{
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+#top{
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+#root{
+  background: #ffe3ee;
+  padding: 10px;
+  border: 1px solid #333;
+  color: #70002b;
+  font-size: 14pt;
+}
+
+.filesUl {
+  padding: 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  font-size: 16px;
+}
+li {
+  position: relative;
+  padding: .4em .4em .4em .8em;
+  margin-top: .5em;
+  background: #D3D4DA;
+  color: #444;
+  text-decoration: none;
+  transition: all .3s ease-out;
+}
+li:hover {
+    background: #DCDDE1;
+    cursor: pointer;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+#myButton{
+  color: brown;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #bdbdbd;
+  border-radius: 0.25rem;
+}
+
+#myButton:hover{
+    background-color: #db281b;
+    color: white;
+}
+
+#myButton:active{
+  background-color: #ff1100;
+  color: brown;
+}
+
+#backButton{
+  border-radius: 1rem;
+  height: 32px;
+  width: 32px;
+  background-color: white;
+  border: 0;
+  background-image: url("../images/backArrow32.png");
+  background-size: contain;
+}
+
+#backButton:hover{
+  background-color: #db281b;
+}
+
+#backButton:active{
+  background-color: #ff1100;
+}
+
+.fileLi{
+  list-style-image: url("../images/file32.png");
+}
+
+.folderLi{
+  list-style-image: url("../images/folder32.png");
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+  .loader::before {
+  content: "";
+  width: 50px;
+  height: 50px;
+  border: 5px solid red;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+  from {
+  transform: rotate(0deg);
+  }
+  to {
+  transform: rotate(360deg);
+  }
+  }
+
+  .hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    pointer-events: none;
+    }
