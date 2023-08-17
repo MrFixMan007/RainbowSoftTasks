@@ -29,11 +29,11 @@ getDir() {
     }, 10);
 
     //получаем тип сортировки
-    let sortType : HTMLInputElement = <HTMLInputElement> document.getElementById(this.sortTypeCheckboxId)
+    const sortType : HTMLInputElement = <HTMLInputElement> document.getElementById(this.sortTypeCheckboxId)
 
     //создаем запрос
-    let xhr : XMLHttpRequest = new XMLHttpRequest();
-    let url : URL = new URL(`http://${window.location.host}/dir`);
+    const xhr : XMLHttpRequest = new XMLHttpRequest();
+    const url : URL = new URL(`http://${window.location.host}/dir`);
 
     //устанавливаем в запрос параметры (адрес root)
     let roorStr : string;
@@ -55,13 +55,13 @@ getDir() {
     //если получили ответ
     xhr.onload = () => {
         //обрабатываем ответ сервера в виде json-файла
-        let unmarshFiles : JSONFile[] = JSON.parse(xhr.response);
+        const unmarshFiles : JSONFile[] = JSON.parse(xhr.response);
 
         //вызываем рендер
         rendering.render.render(unmarshFiles);
 
         //останавливаем таймер
-        let divTimer : HTMLInputElement = <HTMLInputElement> document.getElementById(this.timerId);
+        const divTimer : HTMLInputElement = <HTMLInputElement> document.getElementById(this.timerId);
         clearInterval(timer)
         divTimer.innerHTML=`Время выполнения: ${seconds/100} секунд(ы)`;
     };
@@ -78,7 +78,7 @@ getBackDir(){
     let rootStr : String = "/"
     if(this.root) rootStr = String(this.root.textContent)
   
-    let lastIndexOfSlesh : number = rootStr.lastIndexOf("/")
+    const lastIndexOfSlesh : number = rootStr.lastIndexOf("/")
     if(this.root) this.root.textContent = rootStr.slice(0, lastIndexOfSlesh)
     if(this.root?.textContent == "/" || this.root?.textContent == ""){
         this.root.innerHTML = this.defaultRoot
