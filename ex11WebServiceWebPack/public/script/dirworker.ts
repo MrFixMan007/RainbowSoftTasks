@@ -1,33 +1,28 @@
-import * as rendering from "./render";
-class DirWorker{
+import * as rendering from "./script";
+export default class DirWorker{
     private defaultRoot : string;
 
     private loaderId : string;
-    private rootId : string;
-    private divUnswersId :string;
     private sortTypeCheckboxId : string;
     private timerId : string;
-    // private root : HTMLLabelElement | null;
+    private root : HTMLLabelElement | null;
 
-    constructor(loaderId : string, divUnswersId : string, rootId : string, defaultRoot : string, sortTypeCheckboxId : string, timerId : string){
+    constructor(loaderId : string, rootId : string, defaultRoot : string, sortTypeCheckboxId : string, timerId : string){
         this.defaultRoot = defaultRoot;
 
         this.loaderId = loaderId;
-        this.rootId = rootId;
-        this.divUnswersId = divUnswersId;
         this.sortTypeCheckboxId = sortTypeCheckboxId;
         this.timerId = timerId;
-        // this.root = document.getElementById(rootId)
+        this.root = document.getElementById(rootId) as HTMLLabelElement
     }
 //getDir отправляет запрос серверу, обрабатывает ответы, замеряет время выполнения
-getDir() {  
-    let root : HTMLElement =  <HTMLElement> document.getElementById(this.rootId);
+getDir() { 
     //ставим спинер, скрывая страницу от пользователя
-    let loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
+    const loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
     loader.classList.remove('hidden')
 
     //ставим таймер
-    var seconds : number = 0;
+    let seconds : number = 0;
     const timer : ReturnType<typeof setInterval> = setInterval(()=>
     {
         seconds++;
@@ -42,8 +37,8 @@ getDir() {
 
     //устанавливаем в запрос параметры (адрес root)
     let roorStr : string;
-    if(root) {
-        roorStr = String(root.textContent);
+    if(this.root) {
+        roorStr = String(this.root.textContent);
         url.searchParams.set('root', roorStr);
     }
 
@@ -63,8 +58,7 @@ getDir() {
         let unmarshFiles : JSONFile[] = JSON.parse(xhr.response);
 
         //вызываем рендер
-        let render : rendering.RenderDir = new rendering.RenderDir(this.loaderId, this.divUnswersId, this.rootId);
-        render.render(unmarshFiles);
+        rendering.render.render(unmarshFiles);
 
         //останавливаем таймер
         let divTimer : HTMLInputElement = <HTMLInputElement> document.getElementById(this.timerId);
@@ -81,16 +75,14 @@ getDir() {
 //getBackDir чистит строку вывода с конца до первого встречного слэша
 //и вызывает getDir()
 getBackDir(){
-    let root : HTMLElement =  <HTMLElement> document.getElementById(this.rootId);
     let rootStr : String = "/"
-    if(root) rootStr = String(root.textContent)
+    if(this.root) rootStr = String(this.root.textContent)
   
     let lastIndexOfSlesh : number = rootStr.lastIndexOf("/")
-    if(root) root.textContent = rootStr.slice(0, lastIndexOfSlesh)
-    if(root.textContent == "/" || root.textContent == ""){
-        root.innerHTML = this.defaultRoot
+    if(this.root) this.root.textContent = rootStr.slice(0, lastIndexOfSlesh)
+    if(this.root?.textContent == "/" || this.root?.textContent == ""){
+        this.root.innerHTML = this.defaultRoot
     }
     this.getDir()
   }
 }
-export {DirWorker};

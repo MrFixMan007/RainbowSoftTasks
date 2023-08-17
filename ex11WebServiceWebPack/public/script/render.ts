@@ -1,6 +1,6 @@
 import * as dirWorker from "./script";
 //renderDir отрисовывает новый список с файлами и папками
-class RenderDir{
+export default class RenderDir{
     private loaderId : string;
     private divUnswersId : string;
     private rootId : string;
@@ -58,7 +58,7 @@ class RenderDir{
             if(eventTargetString == '[object HTMLUListElement]') return;
       
             //получаем все элементы списка li
-            var dots : HTMLCollection = document.getElementsByClassName('lis');
+            const dots : HTMLCollection = document.getElementsByClassName('lis');
       
             //получаем json-объект по индексу, найденному по индексу элемента li, на который нажали
             let clickedFileLi : JSONFile = unmarshFiles[Array.from(dots).indexOf(eventTarget)]
@@ -75,4 +75,3 @@ class RenderDir{
         }
       }  
 }
-export {RenderDir};

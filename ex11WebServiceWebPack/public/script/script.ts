@@ -1,8 +1,9 @@
-import * as dirworker from "./dirworker";
+import DirWorker from "./dirworker";
+import RenderDir from "./render";
 
 const defaultRoot : string = '/home' //значение root по умолчанию 
 //получаем адрес корневой папки root и задаём значение по умолчанию
-var root : HTMLElement = <HTMLElement> document.getElementById('root')
+let root : HTMLElement = <HTMLElement> document.getElementById('root')
 if(root) root.innerHTML = defaultRoot
 
 //вешаем обработчики
@@ -10,13 +11,15 @@ let backButton : HTMLElement = <HTMLInputElement> document.getElementById('backB
 let sortType : HTMLElement = <HTMLInputElement> document.getElementById('sortType')
 
 //пока данные грузятся, страницу перекрывает спинер
-var spinnerLoadDir : HTMLElement = document.createElement('div')
+let spinnerLoadDir : HTMLElement = document.createElement('div')
 spinnerLoadDir.className = "loader"
 spinnerLoadDir.id = "loader"
 document.body.append(spinnerLoadDir)
 
-let dirWorker : dirworker.DirWorker = new dirworker.DirWorker(spinnerLoadDir.id, 'unswers', root.id, defaultRoot, 'sortType', 'timer')
-export{dirWorker}
+let dirWorker : DirWorker = new DirWorker(spinnerLoadDir.id, root.id, defaultRoot, 'sortType', 'timer')
+let render : RenderDir = new RenderDir(spinnerLoadDir.id, 'unswers', root.id);
+
+export{dirWorker, render}
 
 if(backButton) {
   backButton.addEventListener('click', getBackDir)
