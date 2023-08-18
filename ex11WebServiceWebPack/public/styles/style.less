@@ -1,0 +1,39 @@
+@import "spiner";
+@import "filesListOfLiAndUl";
+@import "backButton";
+
+@color: #70002b;
+@font-family: Arial, Verdana, Sans-serif;
+@font-size: 14pt;
+
+@width: 75%;
+@margin-left: ((100% - @width) / 2 );
+
+body{
+    color: @color;
+    font-family: @font-family;
+    font-size: @font-size;
+  }
+  
+  input[type=checkbox]:hover{
+    cursor: pointer;
+  }
+  
+  #unswers{
+    width: @width;
+    margin-left: @margin-left;
+  }
+  
+  #top{
+    #unswers();
+  }
+  
+  #root{
+    background: #ffe3ee;
+    padding: 10px;
+    border: 1px solid #333;
+  }
+  
+  button:hover{
+    cursor: pointer;
+  }

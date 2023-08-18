@@ -18,7 +18,6 @@ type File struct {
 }
 
 type ServerOptions struct {
-	Ip   string
 	Port string
 }
 
@@ -60,24 +59,24 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //getIpPort читает и возвращает ip и port из файла config.json
-func getIpPort() (string, string, error) {
+func getPort() (string, error) {
 	file, err := os.Open("config.json")
 	if err != nil {
-		return "", "", fmt.Errorf("Ошибка открытия конфига сервера: ", err)
+		return "", fmt.Errorf("Ошибка открытия конфига сервера: ", err)
 	}
 	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		return "", "", fmt.Errorf("Ошбика чтения данных из файла: ", err)
+		return "", fmt.Errorf("Ошибка чтения данных из файла: ", err)
 	}
 
-	var serverOptions ServerOptions
-	err = json.Unmarshal(data, &serverOptions)
+	var serverPort ServerOptions
+	err = json.Unmarshal(data, &serverPort)
 	if err != nil {
-		return "", "", fmt.Errorf("Ошибка чтения данных из файла: ", err)
+		return "", fmt.Errorf("Ошибка чтения данных из файла: ", err)
 	}
-	return serverOptions.Ip, serverOptions.Port, nil
+	return serverPort.Port, nil
 }
 
 // listDirByReadDir возвращает типы, названия подпапок, файлов и их размеры по переданному адресу
@@ -160,7 +159,7 @@ func SortFiles(files []File, sortType string) []File {
 
 //main получает необходимые конфигурационные данные, ставит обработчики
 func main() {
-	ip, port, err := getIpPort()
+	port, err := getPort()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -171,7 +170,7 @@ func main() {
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/dir", DirHandler)
 
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", ip, port), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil); err != nil {
 		fmt.Println(err)
 	}
 }

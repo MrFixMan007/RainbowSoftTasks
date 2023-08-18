@@ -1,2 +1,2 @@
-import './public/styles/style.css'
+import './public/styles/style.less'
 import './public/script/script'

@@ -1,0 +1,30 @@
+@srcFileLi: url("../images/file32.png");
+@srcFolderLi: url("../images/folder32.png");
+
+.filesUl {
+    padding: 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    font-size: 16px;
+    color: #444;
+    text-decoration: none;
+  }
+  li {
+    position: relative;
+    padding: .4em .4em .4em .8em;
+    margin-top: .5em;
+    background: #D3D4DA;
+    transition: all .3s ease-out;
+
+    &:hover {
+        background: #DCDDE1;
+        cursor: pointer;
+    }
+  }
+
+  .fileLi{
+    list-style-image: @srcFileLi;
+  }
+  
+  .folderLi{
+    list-style-image: @srcFolderLi;
+  }

@@ -1,16 +1,73 @@
 import * as dirWorker from "./script";
 //renderDir отрисовывает новый список с файлами и папками
 export default class RenderDir{
+  readonly arrayOfSizeDescription : string[] = [
+    "байт",
+    "Кбайт",
+    "Мбайт",
+    "Гбайт",
+    "Ебайт"
+];
     private loaderId : string;
     private divUnswersId : string;
     private rootId : string;
+    private sortByFoldersIdCheckbox : string | null;
+    private sortbyFilesIdCheckbox : string | null;
+    private unmarshFiles : JSONFile[] | null = null;
 
-    constructor(loaderId : string, divUnswersId : string, rootId : string) {
+    constructor(loaderId : string, divUnswersId : string, rootId : string, sortByFoldersIdCheckbox : string | null = null, sortbyFilesIdCheckbox : string  | null = null) {
       this.loaderId = loaderId
       this.divUnswersId = divUnswersId
       this.rootId = rootId
+      this.sortByFoldersIdCheckbox = sortByFoldersIdCheckbox
+      this.sortbyFilesIdCheckbox = sortbyFilesIdCheckbox
+    }
+    private compareByFiles(a : JSONFile, b : JSONFile) {
+      if (a.Type == "file") {
+        return -1;
+      }
+      if (a.Type == "folder") {
+        return 1;
+      }
+      return 0;
+    }
+    private compareByFolders(a : JSONFile, b : JSONFile) {
+      if (a.Type == "folder") {
+        return -1;
+      }
+      if (a.Type == "file") {
+        return 1;
+      }
+      return 0;
+    }
+    
+    sortByType(){
+      if (this.sortByFoldersIdCheckbox == null || this.sortbyFilesIdCheckbox == null) return;
+      let type : string = "";
+      const sortByFoldersCheckbox : HTMLInputElement = document.getElementById(this.sortByFoldersIdCheckbox) as HTMLInputElement
+      const sortbyFilesCheckbox : HTMLInputElement = document.getElementById(this.sortbyFilesIdCheckbox) as HTMLInputElement
+      if (sortByFoldersCheckbox.checked == true) {
+        sortbyFilesCheckbox.checked = false;
+        alert("folders")
+        type = "folder"
+      } else if (sortbyFilesCheckbox.checked == true) {
+        sortByFoldersCheckbox.checked = false;
+        alert("files")
+        type = "files"
+      }
+      switch(type){
+        case "":
+          return;
+        case "folder":
+          this.unmarshFiles?.sort(this.compareByFolders)
+          if(this.unmarshFiles) this.render(this.unmarshFiles)
+        case "file":
+          this.unmarshFiles?.sort(this.compareByFiles)
+          if(this.unmarshFiles) this.render(this.unmarshFiles)
+      }
     }
     render(unmarshFiles : JSONFile[]){
+      this.unmarshFiles = unmarshFiles;
         //убираем спинер (делаем невидимым)
         const loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
         loader.classList.add('hidden')
@@ -21,7 +78,6 @@ export default class RenderDir{
         const divUnswers : HTMLElement = <HTMLElement> document.getElementById(this.divUnswersId);
         divUnswers.innerHTML = "";
       
-
         if(unmarshFiles == null){
           divUnswers.innerText = "Папка пуста";
           return;
@@ -48,7 +104,13 @@ export default class RenderDir{
           //элементу списка li присваем строку, которой обрезаем адрес корневой папки,
           //адрес корневой папки выводится наверху страницы
           const rootString : string = String(root?.textContent)
-          li.innerHTML = `${unmarshFiles[i].Name.slice(rootString.length + 1)}&nbsp;:&nbsp${unmarshFiles[i].Size} байт(ов)`;
+          let size : number = +unmarshFiles[i].Size
+          let countOfDivisionOfSize = 0;
+          while(size >= 1024 || countOfDivisionOfSize > this.arrayOfSizeDescription.length){
+              size /= 1024
+              countOfDivisionOfSize++
+          }
+          li.innerHTML = `${unmarshFiles[i].Name.slice(rootString.length + 1)}&nbsp;:&nbsp${size.toFixed(1)} ${this.arrayOfSizeDescription[countOfDivisionOfSize]}`;
       
           //ставим обработчки нажатия на список ul
           ul.onclick = (event) => {
