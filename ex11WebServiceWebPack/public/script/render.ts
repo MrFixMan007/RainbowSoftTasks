@@ -6,68 +6,18 @@ export default class RenderDir{
     "Кбайт",
     "Мбайт",
     "Гбайт",
-    "Ебайт"
+    "Tбайт"
 ];
     private loaderId : string;
     private divUnswersId : string;
     private rootId : string;
-    private sortByFoldersIdCheckbox : string | null;
-    private sortbyFilesIdCheckbox : string | null;
-    private unmarshFiles : JSONFile[] | null = null;
 
-    constructor(loaderId : string, divUnswersId : string, rootId : string, sortByFoldersIdCheckbox : string | null = null, sortbyFilesIdCheckbox : string  | null = null) {
+    constructor(loaderId : string, divUnswersId : string, rootId : string) {
       this.loaderId = loaderId
       this.divUnswersId = divUnswersId
       this.rootId = rootId
-      this.sortByFoldersIdCheckbox = sortByFoldersIdCheckbox
-      this.sortbyFilesIdCheckbox = sortbyFilesIdCheckbox
-    }
-    private compareByFiles(a : JSONFile, b : JSONFile) {
-      if (a.Type == "file") {
-        return -1;
-      }
-      if (a.Type == "folder") {
-        return 1;
-      }
-      return 0;
-    }
-    private compareByFolders(a : JSONFile, b : JSONFile) {
-      if (a.Type == "folder") {
-        return -1;
-      }
-      if (a.Type == "file") {
-        return 1;
-      }
-      return 0;
-    }
-    
-    sortByType(){
-      if (this.sortByFoldersIdCheckbox == null || this.sortbyFilesIdCheckbox == null) return;
-      let type : string = "";
-      const sortByFoldersCheckbox : HTMLInputElement = document.getElementById(this.sortByFoldersIdCheckbox) as HTMLInputElement
-      const sortbyFilesCheckbox : HTMLInputElement = document.getElementById(this.sortbyFilesIdCheckbox) as HTMLInputElement
-      if (sortByFoldersCheckbox.checked == true) {
-        sortbyFilesCheckbox.checked = false;
-        alert("folders")
-        type = "folder"
-      } else if (sortbyFilesCheckbox.checked == true) {
-        sortByFoldersCheckbox.checked = false;
-        alert("files")
-        type = "files"
-      }
-      switch(type){
-        case "":
-          return;
-        case "folder":
-          this.unmarshFiles?.sort(this.compareByFolders)
-          if(this.unmarshFiles) this.render(this.unmarshFiles)
-        case "file":
-          this.unmarshFiles?.sort(this.compareByFiles)
-          if(this.unmarshFiles) this.render(this.unmarshFiles)
-      }
     }
     render(unmarshFiles : JSONFile[]){
-      this.unmarshFiles = unmarshFiles;
         //убираем спинер (делаем невидимым)
         const loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
         loader.classList.add('hidden')
