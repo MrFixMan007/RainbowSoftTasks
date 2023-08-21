@@ -3,6 +3,7 @@ const path = require('path');
 // У самого Webpack уже есть встроенные плагины, их неплохо тоже импортировать
 const webpack = require('webpack');
 module.exports = {
+    watch: true,
     mode: 'development',
     // Указываем входную точку
     entry: './index.ts',
