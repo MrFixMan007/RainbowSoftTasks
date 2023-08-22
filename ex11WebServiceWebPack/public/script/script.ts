@@ -1,7 +1,7 @@
 import DirWorker from "./dirworker"
 import RenderDir from "./render"
 
-var defaultRoot : string = '/home/danila' //значение root по умолчанию 
+var defaultRoot : string = '/home' //значение root по умолчанию 
 //получаем адрес корневой папки root и задаём значение по умолчанию
 const root : HTMLElement = <HTMLElement> document.getElementById('root')
 if(root) root.innerHTML = defaultRoot

@@ -56,7 +56,7 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files = SortFiles(files, sortType)
-	elapsedTimeStr := fmt.Sprintf("%0.1f секунд(ы)\n", float64(time.Since(start)/time.Millisecond)/1000)
+	elapsedTimeStr := fmt.Sprintf("%0.1f секунд(ы)", float64(time.Since(start)/time.Millisecond)/1000)
 	response := responseFiles{Time: elapsedTimeStr, Files: files}
 	json_data, err := json.Marshal(response)
 	if err != nil {
