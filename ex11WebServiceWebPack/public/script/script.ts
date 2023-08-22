@@ -1,7 +1,7 @@
 import DirWorker from "./dirworker"
 import RenderDir from "./render"
 
-var defaultRoot : string = '/home' //значение root по умолчанию 
+var defaultRoot : string = '/home/danila' //значение root по умолчанию 
 //получаем адрес корневой папки root и задаём значение по умолчанию
 const root : HTMLElement = <HTMLElement> document.getElementById('root')
 if(root) root.innerHTML = defaultRoot
@@ -17,8 +17,8 @@ spinnerLoadDir.className = "loader"
 spinnerLoadDir.id = "loader"
 document.body.append(spinnerLoadDir)
 
-const dirWorker : DirWorker = new DirWorker(spinnerLoadDir.id, root.id, defaultRoot, 'sortType', 'timer')
-const render : RenderDir = new RenderDir(spinnerLoadDir.id, 'unswers', root.id)
+const dirWorker : DirWorker = new DirWorker(spinnerLoadDir.id, root.id, defaultRoot, 'sortType')
+const render : RenderDir = new RenderDir(spinnerLoadDir.id, 'unswers', root.id, 'timer')
 
 export{dirWorker, render}
 

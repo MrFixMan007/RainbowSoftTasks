@@ -11,13 +11,19 @@ export default class RenderDir{
     private loaderId : string;
     private divUnswersId : string;
     private rootId : string;
+    private timerId : string;
 
-    constructor(loaderId : string, divUnswersId : string, rootId : string) {
+    constructor(loaderId : string, divUnswersId : string, rootId : string, timerId : string) {
       this.loaderId = loaderId
       this.divUnswersId = divUnswersId
       this.rootId = rootId
+      this.timerId = timerId
     }
-    render(unmarshFiles : JSONFile[]){
+    render(unmarshFiles : ResponseFiles){
+        //ставим значение затраченного времени
+        const timer : HTMLElement = <HTMLElement> document.getElementById(this.timerId);
+        timer.textContent = unmarshFiles.Time
+
         //убираем спинер (делаем невидимым)
         const loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
         loader.classList.add('hidden')
@@ -28,7 +34,7 @@ export default class RenderDir{
         const divUnswers : HTMLElement = <HTMLElement> document.getElementById(this.divUnswersId);
         divUnswers.innerHTML = "";
       
-        if(unmarshFiles == null){
+        if(unmarshFiles.Files == null){
           divUnswers.innerText = "Папка пуста";
           return;
         }
@@ -42,25 +48,25 @@ export default class RenderDir{
         divUnswers.appendChild(ul);
       
         //обрабатываем полученные данные
-        for (let i = 0; i < unmarshFiles.length; i++){
+        for (let i = 0; i < unmarshFiles.Files.length; i++){
       
           //добавляем в список элементы li и в зависимости от типа элемента списка
           //(папка, файл) ставим свою марку
           const li : HTMLElement = document.createElement("li");
           li.id = `filesLi${i}`;
-          if(unmarshFiles[i].Type == "file") li.className = "lis fileLi"
+          if(unmarshFiles.Files[i].Type == "file") li.className = "lis fileLi"
           else li.className = "lis folderLi"
       
           //элементу списка li присваем строку, которой обрезаем адрес корневой папки,
           //адрес корневой папки выводится наверху страницы
           const rootString : string = String(root?.textContent)
-          let size : number = +unmarshFiles[i].Size
+          let size : number = +unmarshFiles.Files[i].Size
           let countOfDivisionOfSize = 0;
           while(size >= 1024 || countOfDivisionOfSize > this.arrayOfSizeDescription.length){
               size /= 1024
               countOfDivisionOfSize++
           }
-          li.innerHTML = `${unmarshFiles[i].Name.slice(rootString.length + 1)}&nbsp;:&nbsp${size.toFixed(1)} ${this.arrayOfSizeDescription[countOfDivisionOfSize]}`;
+          li.innerHTML = `${unmarshFiles.Files[i].Name.slice(rootString.length + 1)}&nbsp;:&nbsp${size.toFixed(1)} ${this.arrayOfSizeDescription[countOfDivisionOfSize]}`;
       
           //ставим обработчки нажатия на список ul
           ul.onclick = (event) => {
@@ -73,7 +79,7 @@ export default class RenderDir{
             const dots : HTMLCollection = document.getElementsByClassName('lis');
       
             //получаем json-объект по индексу, найденному по индексу элемента li, на который нажали
-            const clickedFileLi : JSONFile = unmarshFiles[Array.from(dots).indexOf(eventTarget)]
+            const clickedFileLi : JSONFile = unmarshFiles.Files[Array.from(dots).indexOf(eventTarget)]
       
             //нажатие на файл не обрабатываем
             if(clickedFileLi.Type == 'file') return

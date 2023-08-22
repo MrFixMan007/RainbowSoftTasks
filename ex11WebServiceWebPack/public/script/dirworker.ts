@@ -4,15 +4,13 @@ export default class DirWorker{
 
     private loaderId : string;
     private sortTypeCheckboxId : string;
-    private timerId : string;
     private root : HTMLLabelElement | null;
 
-    constructor(loaderId : string, rootId : string, defaultRoot : string, sortTypeCheckboxId : string, timerId : string){
+    constructor(loaderId : string, rootId : string, defaultRoot : string, sortTypeCheckboxId : string){
         this.defaultRoot = defaultRoot;
 
         this.loaderId = loaderId;
         this.sortTypeCheckboxId = sortTypeCheckboxId;
-        this.timerId = timerId;
         this.root = document.getElementById(rootId) as HTMLLabelElement
     }
 //getDir отправляет запрос серверу, обрабатывает ответы, замеряет время выполнения
@@ -20,13 +18,6 @@ getDir() {
     //ставим спинер, скрывая страницу от пользователя
     const loader : HTMLElement = <HTMLElement> document.getElementById(this.loaderId);
     loader.classList.remove('hidden')
-
-    //ставим таймер
-    let seconds : number = 0;
-    const timer : ReturnType<typeof setInterval> = setInterval(()=>
-    {
-        seconds++;
-    }, 10);
 
     //получаем тип сортировки
     const sortType : HTMLInputElement = <HTMLInputElement> document.getElementById(this.sortTypeCheckboxId)
@@ -55,15 +46,9 @@ getDir() {
     //если получили ответ
     xhr.onload = () => {
         //обрабатываем ответ сервера в виде json-файла
-        const unmarshFiles : JSONFile[] = JSON.parse(xhr.response);
-
+        const unmarshFiles : ResponseFiles = JSON.parse(xhr.response);
         //вызываем рендер
         rendering.render.render(unmarshFiles);
-
-        //останавливаем таймер
-        const divTimer : HTMLInputElement = <HTMLInputElement> document.getElementById(this.timerId);
-        clearInterval(timer)
-        divTimer.innerHTML=`Время выполнения: ${seconds/100} секунд(ы)`;
     };
 
     //если получили ошибку
