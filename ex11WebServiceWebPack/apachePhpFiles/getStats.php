@@ -19,6 +19,7 @@
     <th>Адрес</th>
     <th>Дата обращения</th>
     <th>Затраченное время</th>
+    <th>Размер</th>
    </tr>
    <?php
       $host = 'localhost'; // адрес сервера
@@ -50,6 +51,10 @@
       echo "<td>";
       echo  $row['elapsed_time'];
       echo " миллисекунд(ы)";
+      echo "</td>";
+      echo "<td>";
+      echo  $row['size'];
+      echo " байт";
       echo "</td>";
       echo "</tr>";
    }
