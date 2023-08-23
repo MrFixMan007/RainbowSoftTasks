@@ -42,12 +42,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 //DirHandler получает адрес и тип сортировки, сортирует и отправляет массив объектов в формате json
 func DirHandler(w http.ResponseWriter, r *http.Request) {
+	//Узнаём время
 	start := time.Now()
+
+	//Ставим заголовок тип контента на json
 	w.Header().Set("Content-Type", "application/json")
 
+	//получаем входные параметры из запроса
 	root, sortType := r.URL.Query().Get("root"), r.URL.Query().Get("sortType")
 	fmt.Printf("Получен %s\n", root)
 
+	//Подсчитываем файлы/папки по адресу
 	files, err := listDirByReadDir(root)
 	if err != nil {
 		fmt.Println(err)
@@ -55,14 +60,21 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Сортировка по размеру
 	files = SortFiles(files, sortType)
-	elapsedTimeStr := fmt.Sprintf("%0.1f секунд(ы)", float64(time.Since(start)/time.Millisecond)/1000)
+
+	//Вычисляем сколько времени заняло
+	elapsedTime := float64(time.Since(start) / time.Millisecond)
+	elapsedTimeStr := fmt.Sprintf("%0.1f секунд(ы)", float64(elapsedTime/1000))
+
+	//Маршалим ответ в вид json
 	response := responseFiles{Time: elapsedTimeStr, Files: files}
 	json_data, err := json.Marshal(response)
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	//Отправляем ответ
 	_, err = w.Write(json_data)
 	if err != nil {
 		fmt.Println(err)
@@ -70,17 +82,17 @@ func DirHandler(w http.ResponseWriter, r *http.Request) {
 
 	//получаем ip
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	go addStatistic(root, elapsedTimeStr, ip)
+	go addStatistic(root, elapsedTime, ip)
 }
 
 //addStatistic отправляет Put-запрос на сервер Apache, который записывает статистику в БД
-func addStatistic(root string, elapsedTime string, ip string) error {
+func addStatistic(root string, elapsedTime float64, ip string) error {
 
 	//адрес на php-скрипт сервера Apache
 	url := fmt.Sprintf("http://%s:80/stat.php", ip)
 
 	//создаём переменную, которую передадим
-	values := map[string]string{"root": root, "elapsed_time": elapsedTime}
+	values := map[string]string{"root": root, "elapsed_time": fmt.Sprintf("%0.0f", elapsedTime)}
 
 	//маршалим в формат json
 	json_data, err := json.Marshal(values)

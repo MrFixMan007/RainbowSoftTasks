@@ -29,7 +29,7 @@ if(sortType) {
   sortType.addEventListener('click', getDir)
 }
 if(aStatistic){
-  aStatistic.href = `http://${window.location.hostname}:80/stat.html`
+  aStatistic.href = `http://${window.location.hostname}:80/getStats.php`
 }
 
 function getBackDir(){
