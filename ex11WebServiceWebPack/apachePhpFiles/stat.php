@@ -9,12 +9,14 @@ $body = file_get_contents('php://input');
 $jsondata = json_decode($body, true);
 $root = $jsondata['root'];
 $time = $jsondata['elapsed_time'];
+$totalSize = $jsondata['totalSize'];
 
 //отправляем ответ
 http_response_code(201);
 $responseData = array(
     'time' => "$time",
-    'root' => "$root"
+    'root' => "$root",
+    'totalSize' => "$totalSize"
 );
 echo json_encode(($responseData));
 
@@ -25,7 +27,7 @@ echo json_encode(($responseData));
     $today = date("Y-m-d H:i:s");
 
 // текст SQL запроса, который будет передан базе
-   $query = "insert into statistics (root, date, elapsed_time) values ('$root', '$today', '$time')";
+   $query = "insert into statistics (root, date, elapsed_time, size) values ('$root', '$today', '$time', '$totalSize')";
 
 // выполняем запрос к базе данных
    $result = mysqli_query($connection, $query);
